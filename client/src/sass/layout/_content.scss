@@ -1,0 +1,9 @@
+// main content under header
+.content {
+  // flex container to show sidebar and main-content side by side
+  display: flex;
+  // when screen gets too small, display sidebar on top
+  @media only screen and (max-width: $bp-medium) {
+    flex-direction: column;
+  }
+}

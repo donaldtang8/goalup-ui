@@ -1,0 +1,46 @@
+.splash-container {
+  width: 100%;
+  position: relative;
+  height: 93vh;
+  margin-top: 7vh;
+
+  display: flex;
+  flex-direction: row;
+
+  &__desc {
+    flex: 0 0 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 3rem;
+  }
+
+  &__signup {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-light);
+
+    &__form {
+      flex: 0 0 50%;
+    }
+  }
+}
+
+.bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 93vh;
+  width: 50%;
+  z-index: -1;
+  opacity: 0.5;
+  overflow: hidden;
+
+  &__content {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+}

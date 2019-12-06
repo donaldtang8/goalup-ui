@@ -1,0 +1,99 @@
+.profile-container__header {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  position: relative;
+  font-size: $medium-font-size;
+
+  &--icon {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+
+  &--banner {
+    background-color: var(--color-primary-light);
+    height: 20rem;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  &--picture {
+    position: absolute;
+    top: 12.5rem;
+    left: 3rem;
+  }
+
+  &--img {
+    height: 15rem;
+    width: 15rem;
+    border-radius: 50%;
+  }
+
+  &--section {
+    background-color: var(--color-grey-light-2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 2rem;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+  }
+
+  &--bio {
+    flex: 0 0 70%;
+    margin-top: 2rem;
+    margin-left: 3rem;
+  }
+
+  &--name {
+    font-size: $default-font-size;
+    font-weight: 900;
+  }
+
+  &--username {
+    font-size: $medium-font-size;
+    font-weight: 400;
+    text-transform: lowercase;
+  }
+
+  &--biography {
+    font-size: $medium-font-size;
+  }
+
+  &--bio-item {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &--location {
+    display: flex;
+    align-items: center;
+  }
+
+  &--date,
+  &--following {
+    margin-left: 2rem;
+  }
+
+  &--followers,
+  &--following {
+    display: flex;
+  }
+
+  &--side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 3rem 2rem 0 0;
+  }
+
+  &--actions {
+  }
+}
+
+.profile-container__body {
+  margin-top: 2rem;
+  width: 50%;
+}

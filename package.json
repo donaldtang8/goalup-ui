@@ -1,0 +1,37 @@
+{
+  "name": "goalup",
+  "version": "1.0.0",
+  "description": "A social media platform connecting individuals with similar goals and interests",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "server": "node server",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \" npm run server\" \"npm run client\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Donald Tang",
+  "license": "ISC",
+  "dependencies": {
+    "autosuggest-highlight": "^3.1.1",
+    "bcryptjs": "^2.4.3",
+    "config": "^3.2.3",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-jwt": "^5.3.1",
+    "express-validator": "^6.2.0",
+    "gravatar": "^1.8.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
+    "mongoose": "^5.7.7",
+    "mongoose-findorcreate": "^3.0.0",
+    "node-sass": "^4.13.0",
+    "react-autosuggest": "^9.4.3",
+    "request": "^2.88.0",
+    "valid-url": "^1.0.9"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.2",
+    "nodemon": "^1.19.3"
+  }
+}

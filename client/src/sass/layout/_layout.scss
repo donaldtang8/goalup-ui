@@ -1,0 +1,123 @@
+// container for entire body layout
+.container {
+  background-color: var(--color-grey-light-1);
+  box-shadow: var(--shadow-dark);
+
+  @media only screen and (max-width: $bp-largest) {
+    margin: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+// top header bar
+.header {
+  // make top header bar sticky
+  position: fixed;
+  width: 100%;
+  // styling
+  font-size: 1.5rem;
+  height: 7vh;
+  background-color: var(--color-light);
+  border-bottom: var(--line);
+  // make header flexbox
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @media only screen and (max-width: $bp-smallest) {
+    flex-wrap: wrap;
+    align-content: space-around;
+    height: 11rem;
+  }
+}
+
+// main content under header
+.content {
+  // flex container to show sidebar and main-content side by side
+  display: flex;
+  // when screen gets too small, display sidebar on top
+  @media only screen and (max-width: $bp-medium) {
+    flex-direction: column;
+  }
+}
+
+// sidebar menu
+.sidebar {
+  // make sidebar menu fixed
+  position: fixed;
+  width: 25rem;
+  margin-top: 7vh;
+  height: 93vh;
+  background-color: var(--color-grey-dark-1);
+  // sidebar will take 18% of width, no grow, no shrink, 18% width
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  // when screen gets smaller, change fixed position to relative to put sidebar menu above main content and set width
+  @media only screen and (max-width: $bp-medium) {
+    width: 100%;
+    height: 5vh;
+  }
+}
+
+// main view of the content
+.main-view {
+  // position to match fixed header and sidebar menu
+  margin-top: 7vh;
+  margin-left: 25rem;
+  height: 93vh;
+  // styles
+  background-color: var(--color-light);
+  // when screen gets smaller and sidebar menu stacks on top of main content and spread across page
+  @media only screen and (max-width: $bp-medium) {
+    margin-left: 0;
+    margin-top: 12vh;
+    height: 93vh;
+  }
+}
+
+//
+.detail {
+  font-size: 1.4rem;
+  display: flex;
+  padding: 4.5rem;
+  background-color: var(--color-grey-light-1);
+  border-bottom: var(--line);
+
+  @media only screen and (max-width: $bp-medium) {
+    padding: 3rem;
+  }
+
+  @media only screen and (max-width: $bp-small) {
+    flex-direction: column;
+  }
+}
+
+.description {
+  background-color: var(--color-light);
+  box-shadow: var(--shadow-light);
+  padding: 3rem;
+  flex: 0 0 60%;
+  margin-right: 4.5rem;
+  align-self: stretch;
+
+  @media only screen and (max-width: $bp-medium) {
+    padding: 2rem;
+    margin-right: 3rem;
+  }
+
+  @media only screen and (max-width: $bp-medium) {
+    margin-right: 0;
+    margin-bottom: 3rem;
+  }
+}
+
+.user-reviews {
+  background-color: var(--color-grey-light-1);
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

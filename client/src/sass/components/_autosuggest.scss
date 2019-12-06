@@ -1,0 +1,103 @@
+// SEARCH BOX CONTAINER
+.react-autosuggest__container {
+  flex: 0 0 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+// SEARCH BOX INPUT
+.react-autosuggest__input {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background-color: var(--color-grey-light-2);
+  border: none;
+  padding: 0.7rem 2rem;
+  border-radius: 10rem;
+  width: 90%;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    width: 100%;
+    background-color: var(--color-grey-light-3);
+  }
+
+  &::-webkit-input-placeholder {
+    font-weight: 100;
+    color: var(--color-grey-light-4);
+  }
+}
+
+// SEARCH RESULTS CONTAINER WHEN CLOSED
+.react-autosuggest__suggestions-container {
+  display: none;
+}
+
+// SEARCH RESULTS CONTAINER WHEN OPENED
+.react-autosuggest__container--open .react-autosuggest__suggestions-container {
+  display: block;
+  position: absolute;
+  top: 51px;
+  width: 100%;
+  border-radius: 1rem;
+  background-color: var(--color-grey-light-2);
+  border: none;
+  font-size: $default-font-size;
+  z-index: 2;
+}
+
+// UNORDERED LIST OF SUGGESTIONS
+.react-autosuggest__suggestions-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+// EACH SUGGESTION LI ITEM IN LIST
+.react-autosuggest__suggestion {
+  cursor: pointer;
+  padding: 1rem 0;
+  border-radius: 1rem;
+}
+
+.react-autosuggest__suggestion:not(:first-child) {
+  border-top: 1px solid #ddd;
+}
+
+// EACH SUGGESTION LI ITEM IN LIST WHEN HOVERED
+.react-autosuggest__suggestion--highlighted {
+  background-color: var(--color-grey-light-2);
+  color: var(--color-dark);
+}
+
+// INNER CONTENT OF EACH SUGGESTION
+.suggestion-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  &--header {
+    flex: 0 0 20%;
+    display: flex;
+    justify-content: center;
+  }
+
+  &--img {
+    height: 4rem;
+    width: 4rem;
+    border-radius: 50%;
+  }
+}
+
+// COLOR OF HIGHLIGHTED MATCH PART
+.highlight {
+  color: #ee0000;
+  font-weight: bold;
+}
+
+// COLOR OF HIGHLIGHTED MATCH PART WHEN HOVERED
+.react-autosuggest__suggestion--focused .highlight {
+  color: #120000;
+}

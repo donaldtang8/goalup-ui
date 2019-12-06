@@ -1,0 +1,17 @@
+// main view of the content
+.main-view {
+  // position to match fixed header and sidebar menu
+  margin-top: 7vh;
+  margin-left: 25rem;
+  min-height: 93vh;
+  width: 100%;
+  overflow: hidden;
+  // styles
+  background-color: var(--color-grey-dark-1);
+  // when screen gets smaller and sidebar menu stacks on top of main content and spread across page
+  @media only screen and (max-width: $bp-medium) {
+    margin-left: 0;
+    margin-top: 12vh;
+    height: 93vh;
+  }
+}

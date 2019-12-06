@@ -1,0 +1,18 @@
+// sidebar menu
+.sidebar {
+  // make sidebar menu fixed
+  position: fixed;
+  width: 25rem;
+  margin-top: 7vh;
+  height: 93vh;
+  background-color: var(--color-grey-dark-1);
+  // sidebar will take 18% of width, no grow, no shrink, 18% width
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  // when screen gets smaller, change fixed position to relative to put sidebar menu above main content and set width
+  @media only screen and (max-width: $bp-medium) {
+    width: 100%;
+    height: 5vh;
+  }
+}

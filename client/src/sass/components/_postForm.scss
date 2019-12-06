@@ -1,0 +1,54 @@
+.postForm-container {
+  width: 50%;
+  background-color: var(--color-grey-light-3);
+  display: flex;
+  flex-direction: column;
+  border-radius: 1rem;
+  overflow: none;
+
+  &--top {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 10rem;
+  }
+
+  &--bottom {
+    display: flex;
+    margin: 1rem 3rem;
+    justify-content: center;
+  }
+
+  &--img {
+    height: 5rem;
+    width: 5rem;
+    border-radius: 50%;
+    margin-left: 2rem;
+  }
+
+  &--form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-top: 0;
+    height: 100%;
+
+    textarea {
+      margin-top: 0;
+      font-size: 1.5rem;
+      font-family: inherit;
+      color: inherit;
+      padding: 2.5rem 2rem 1rem 2rem;
+      background-color: var(--color-grey-light-3);
+      outline: none;
+      border: none;
+      border-radius: 1rem;
+      width: 100%;
+      display: block;
+      transition: all 0.3s;
+      resize: none;
+      height: 100%;
+    }
+  }
+}

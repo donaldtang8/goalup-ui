@@ -1,0 +1,22 @@
+// top header bar
+.header {
+  // make top header bar sticky
+  position: fixed;
+  width: 100%;
+  // styling
+  font-size: 1.5rem;
+  height: 7vh;
+  background-color: var(--color-light);
+  border-bottom: var(--line);
+  // make header flexbox
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 150;
+
+  @media only screen and (max-width: $bp-smallest) {
+    flex-wrap: wrap;
+    align-content: space-around;
+    height: 11rem;
+  }
+}

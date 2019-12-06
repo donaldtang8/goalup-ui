@@ -1,0 +1,21 @@
+.forms-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 93vh;
+  margin-top: 7vh;
+
+  &__form {
+    width: 50%;
+  }
+}
+
+.profile-forms-container,
+.group-forms-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem auto;
+}
