@@ -2,10 +2,9 @@
   "name": "goalup",
   "version": "1.0.0",
   "description": "A social media platform connecting individuals with similar goals and interests",
-  "main": "server.js",
   "scripts": {
     "start": "node server",
-    "server": "node server",
+    "server": "node server.js",
     "client": "npm start --prefix client",
     "build": "cd client && npm run build",
     "dev": "concurrently \" npm run server\" \"npm run client\"",
