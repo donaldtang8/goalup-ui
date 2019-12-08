@@ -1,3 +1,4 @@
+require("dotenv").config();
 const connectDB = require("./config/db");
 const express = require("express");
 const cors = require("cors");
@@ -5,14 +6,14 @@ const path = require("path");
 const compression = require("compression");
 const enforce = require("express-sslify");
 
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
-
 connectDB();
 const app = express();
 
 app.use(express.json({ extended: false }));
+
+app.use(cors());
+app.use(compression());
+app.use(enforce.HTTPS({ trustProtoHeader: true }));
 
 if (process.env.NODE_ENV === "production") {
   app.use(compression());
