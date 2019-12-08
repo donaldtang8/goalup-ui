@@ -489,7 +489,7 @@ a {
     height: 1.5rem;
     width: 1.5rem; }
   .group-container__header--banner {
-    background-color: orangered;
+    background-color: var(--color-primary-light);
     height: 20rem;
     border-top-left-radius: 1rem;
     border-top-right-radius: 1rem; }
@@ -502,7 +502,7 @@ a {
     width: 15rem;
     border-radius: 50%; }
   .group-container__header--section {
-    background-color: yellowgreen;
+    background-color: var(--color-grey-light-2);
     display: flex;
     flex-direction: column;
     justify-content: space-between;

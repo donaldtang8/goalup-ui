@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { withRouter, Redirect } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { createProfile } from "../../redux/actions/profiles";
 import PropTypes from "prop-types";
@@ -13,12 +13,7 @@ const CreateProfile = ({ auth, createProfile, history }) => {
     location: "",
     hobbies: "",
     interests: "",
-    website: "",
-    twitter: "",
-    facebook: "",
-    linkedin: "",
-    youtube: "",
-    instagram: ""
+    website: ""
   });
 
   const [formErrors, setFormErrors] = useState({
@@ -28,12 +23,14 @@ const CreateProfile = ({ auth, createProfile, history }) => {
     locationError: "",
     hobbiesError: "",
     interestsError: "",
+    websiteError: "",
     bioValid: false,
     goalValid: false,
     statusValid: false,
     locationValid: false,
     hobbiesValid: false,
-    interestsValid: false
+    interestsValid: false,
+    websiteValid: false
   });
 
   const {
@@ -44,12 +41,7 @@ const CreateProfile = ({ auth, createProfile, history }) => {
     location,
     hobbies,
     interests,
-    website,
-    twitter,
-    facebook,
-    linkedin,
-    youtube,
-    instagram
+    website
   } = formData;
 
   const {

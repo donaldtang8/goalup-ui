@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 import { createProfile, getCurrentProfile } from "../../redux/actions/profiles";
 
 const EditProfile = ({
-  profile: { profile, loading, user },
+  profile: { profile },
   createProfile,
   getCurrentProfile,
   history
@@ -27,12 +27,7 @@ const EditProfile = ({
     goal: "",
     hobbies: "",
     interests: "",
-    website: "",
-    twitter: "",
-    facebook: "",
-    linkedin: "",
-    youtube: "",
-    instagram: ""
+    website: ""
   });
 
   const [formErrors, setFormErrors] = useState({
@@ -43,23 +38,13 @@ const EditProfile = ({
     hobbiesError: "",
     interestsError: "",
     websiteError: "",
-    twitterError: "",
-    facebookError: "",
-    linkedinError: "",
-    youtubeError: "",
-    instagramError: "",
     bioValid: true,
     statusValid: true,
     locationValid: true,
     goalValid: true,
     hobbiesValid: true,
     interestsValid: true,
-    websiteValid: true,
-    twitterValid: true,
-    facebookValid: true,
-    linkedinValid: true,
-    youtubeValid: true,
-    instagramValid: true
+    websiteValid: true
   });
 
   const fillInputs = () => {
@@ -83,12 +68,7 @@ const EditProfile = ({
     website,
     goal,
     hobbies,
-    interests,
-    twitter,
-    facebook,
-    linkedin,
-    youtube,
-    instagram
+    interests
   } = formData;
 
   const {
@@ -99,26 +79,14 @@ const EditProfile = ({
     hobbiesError,
     interestsError,
     websiteError,
-    twitterError,
-    facebookError,
-    linkedinError,
-    youtubeError,
-    instagramError,
     bioValid,
     statusValid,
     locationValid,
     goalValid,
     hobbiesValid,
     interestsValid,
-    websiteValid,
-    twitterValid,
-    facebookValid,
-    linkedinValid,
-    youtubeValid,
-    instagramValid
+    websiteValid
   } = formErrors;
-
-  const [displaySocialInputs, toggleSocialInputs] = useState(false);
 
   useEffect(() => {
     validateForm(field);

@@ -8,7 +8,6 @@ connectDB();
 app.use(express.json({ extended: false }));
 
 app.use("/api/users", require("./routes/api/users"));
-// app.use("/api/google", require("./routes/auth/social"));
 app.use("/api/profile", require("./routes/api/profiles"));
 app.use("/api/posts", require("./routes/api/posts"));
 app.use("/api/groups", require("./routes/api/groups"));

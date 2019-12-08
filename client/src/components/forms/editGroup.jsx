@@ -23,7 +23,7 @@ const EditGroup = ({
 
   useEffect(() => {
     fillInputs();
-  }, [group]);
+  }, [group, fillInputs]);
 
   const [formData, setFormData] = useState({
     field: "",
