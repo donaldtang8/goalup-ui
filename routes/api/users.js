@@ -8,6 +8,7 @@ const jwt = require("jsonwebtoken");
 const { check, validationResult } = require("express-validator");
 const User = require("../../models/User");
 const Profile = require("../../models/Profile");
+const Notification = require("../../models/Notification");
 const _ = require("lodash");
 
 // @route   GET api/users
@@ -171,9 +172,9 @@ router.post(
 router.post("/follow/:userId", auth, async (req, res) => {
   try {
     // see if user exists
-    let user = await User.findOne({ _id: req.params.userId });
-    let self = await User.findOne({ _id: req.user.id });
-    let userProfile = await Profile.findOne({
+    let userFrom = await User.findById(req.user.id).select("-password");
+    let userTo = await User.findById(req.params.userId).select("-password");
+    let userToProfile = await Profile.findOne({
       user: req.params.userId
     }).populate("user", [
       "name",
@@ -183,55 +184,151 @@ router.post("/follow/:userId", auth, async (req, res) => {
       "followers",
       "following"
     ]);
-    let selfProfile = await Profile.findOne({ user: req.user.id });
+    let userFromProfile = await Profile.findOne({ user: req.user.id });
 
-    if (!user || !userProfile) {
+    if (!userTo || !userToProfile) {
       return res.status(400).json({ errors: [{ msg: "User does not exist" }] });
     }
 
     // if following user already
     if (
-      user.followers.filter(
+      userTo.followers.filter(
         follower => follower.user.toString() === req.user.id
       ).length > 0
     ) {
       //remove self from user.followers
-      const userRemoveIndex = user.followers
+      const userToRemoveIndex = userTo.followers
         .map(follower => follower.user.toString())
         .indexOf(req.user.id);
-      user.followers.splice(userRemoveIndex, 1);
+      userTo.followers.splice(userToRemoveIndex, 1);
       // remove user from self.following
-      const selfRemoveIndex = self.following
+      const userFromRemoveIndex = userFrom.following
         .map(follow => follow.user.toString())
         .indexOf(req.params.userId);
-      self.following.splice(selfRemoveIndex, 1);
+      userFrom.following.splice(userFromRemoveIndex, 1);
       // remove follower from user's profile
-      const userProfileRemoveIndex = userProfile.followers
+      const userToProfileRemoveIndex = userToProfile.followers
         .map(follower => follower.user.toString())
         .indexOf(req.user.id);
-      userProfile.followers.splice(userProfileRemoveIndex, 1);
+      userToProfile.followers.splice(userToProfileRemoveIndex, 1);
       // remove user from self profile
-      const selfProfileRemoveIndex = selfProfile.followers
+      const userFromProfileRemoveIndex = userFromProfile.followers
         .map(follower => follower.user.toString())
         .indexOf(req.params.userId);
-      selfProfile.following.splice(selfProfileRemoveIndex, 1);
+      userFromProfile.following.splice(userFromProfileRemoveIndex, 1);
     } else {
       // otherwise if not following
-      // add self to user.followers
-      // unshift will add user to the front of the likes array of post
-      user.followers.unshift({ user: req.user.id });
-      self.following.unshift({ user: req.params.userId });
-      userProfile.followers.unshift({ user: req.user.id });
-      selfProfile.following.unshift({ user: req.params.userId });
+      // create new notification for follow request
+      const messageString = userFrom.name + " sent you a follow request";
+      const notification = new Notification({
+        user_from: req.user.id,
+        user_to: req.params.userId,
+        item_id: req.params.userId,
+        action: "follow",
+        message: messageString
+      });
+      await notification.save();
+      // add to user_to's follower received requests
+      userTo.follower_received_requests.unshift({ user: req.user.id });
+      // add to user_from's follower sent requests
+      userFrom.follower_sent_requests.unshift({ user: req.params.userId });
     }
-    await user.save();
-    await self.save();
-    await userProfile.save();
-    await selfProfile.save();
-    res.json(userProfile);
+    await userTo.save();
+    await userFrom.save();
+    await userToProfile.save();
+    await userFromProfile.save();
+    res.json(userToProfile);
     // res.json({
     //   follow: [{ followers: user.followers }, { following: user.following }]
     // });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// @route   POST api/users/follow_response/:userId/:response
+// @desc    Follow or unfollow other users by id
+// @access  Private
+router.post("/follow_response/:userId/", auth, async (req, res) => {
+  try {
+    let userFrom = await User.findById(req.user.id).select("-password");
+    let userTo = await User.findById(req.params.userId).select("-password");
+    let userToProfile = await Profile.findOne({
+      user: req.params.userId
+    }).populate("user", [
+      "name",
+      "username",
+      "email",
+      "avatar",
+      "followers",
+      "following"
+    ]);
+    let userFromProfile = await Profile.findOne({ user: req.user.id });
+    // check if there is a request from userTo to userFrom
+    // to do this, we should check userId's follower_sent_requests and see if req.user.id is in there
+    // if not there, user is not authorized to respond to request
+    if (
+      userTo.follower_sent_requests.filter(
+        follower => follower.user.toString() === req.user.id
+      ).length === 0
+    ) {
+      return res.status(400).json({ errors: [{ msg: "User not authorized" }] });
+    }
+    // if friend request is accepted
+    if (req.body.response === "accept") {
+      // create new notification
+      const messageString = userFrom.name + " accepted your friend request";
+      const notification = new Notification({
+        user_from: req.user.id,
+        user_to: req.params.userId,
+        item_id: req.params.userId,
+        action: "follow_response",
+        message: messageString
+      });
+      await notification.save();
+      // unshift will add user to the front of the likes array of post
+      userTo.followers.unshift({ user: req.user.id });
+      userFrom.following.unshift({ user: req.params.userId });
+      userToProfile.followers.unshift({ user: req.user.id });
+      userFromProfile.following.unshift({ user: req.params.userId });
+      // remove requests
+      //remove received request from user's requests
+      const userFromRemoveIndex = userFrom.follower_received_requests
+        .map(follower => follower.user.toString())
+        .indexOf(req.params.userId);
+      userFrom.follower_received_requests.splice(userFromRemoveIndex, 1);
+      // remove sent request from other user's requests
+      const userToRemoveIndex = userTo.follower_sent_requests
+        .map(follow => follow.user.toString())
+        .indexOf(req.user.id);
+      userTo.follower_sent_requests.splice(userToRemoveIndex, 1);
+    } else {
+      // create new notification
+      const messageString = userFrom.name + " rejected your friend request";
+      const notification = new Notification({
+        user_from: req.user.id,
+        user_to: req.params.userId,
+        item_id: req.params.userId,
+        action: "follow_response",
+        message: messageString
+      });
+      await notification.save();
+      // remove requests
+      //remove received request from user's requests
+      const userFromRemoveIndex = userFrom.follower_received_requests
+        .map(follower => follower.user.toString())
+        .indexOf(req.params.userId);
+      userFrom.follower_received_requests.splice(userFromRemoveIndex, 1);
+      // remove sent request from other user's requests
+      const userToRemoveIndex = userTo.follower_sent_requests
+        .map(follow => follow.user.toString())
+        .indexOf(req.user.id);
+      userTo.follower_sent_requests.splice(userToRemoveIndex, 1);
+    }
+    await userTo.save();
+    await userFrom.save();
+    res.json(userFrom.follower_received_requests);
   } catch (err) {
     console.log(err.message);
     res.status(500).send("Server error");

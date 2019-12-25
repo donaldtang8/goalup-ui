@@ -22,6 +22,22 @@ const UserSchema = new mongoose.Schema({
   avatar: {
     type: String
   },
+  follower_received_requests: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
+      }
+    }
+  ],
+  follower_sent_requests: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
+      }
+    }
+  ],
   followers: [
     {
       user: {
@@ -43,6 +59,14 @@ const UserSchema = new mongoose.Schema({
       group: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "group"
+      }
+    }
+  ],
+  notifications: [
+    {
+      notification: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "notification"
       }
     }
   ],

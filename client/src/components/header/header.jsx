@@ -60,12 +60,27 @@ const Header = ({
       <AutosuggestSearch />
 
       <nav className="user-nav">
+        <Link to="/" className="user-nav__icon-box">
+          <svg className="user-nav__icon">
+            <use xlinkHref={`${sprite}#icon-home`}></use>
+          </svg>
+        </Link>
+        <Link to="/profiles" className="user-nav__icon-box">
+          <svg className="user-nav__icon">
+            <use xlinkHref={`${sprite}#icon-users`}></use>
+          </svg>
+        </Link>
+        <Link to="/groups" className="user-nav__icon-box">
+          <svg className="user-nav__icon">
+            <use xlinkHref={`${sprite}#icon-mask`}></use>
+          </svg>
+        </Link>
         <div
           className="user-nav__icon-box"
           onClick={() => alert("Feature coming soon")}
         >
           <svg className="user-nav__icon">
-            <use xlinkHref={`${sprite}#icon-bookmark`}></use>
+            <use xlinkHref={`${sprite}#icon-message`}></use>
           </svg>
           <span className="user-nav__notification">7</span>
         </div>
@@ -74,9 +89,9 @@ const Header = ({
           onClick={() => alert("Feature coming soon")}
         >
           <svg className="user-nav__icon">
-            <use xlinkHref={`${sprite}#icon-chat`}></use>
+            <use xlinkHref={`${sprite}#icon-bookmark`}></use>
           </svg>
-          <span className="user-nav__notification">8</span>
+          <span className="user-nav__notification">7</span>
         </div>
         <div className="user-nav__user" onClick={() => toggleDropdown()}>
           <img

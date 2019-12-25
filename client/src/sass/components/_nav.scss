@@ -48,12 +48,13 @@
   }
 
   &__user-photo {
-    height: 3.75rem;
+    height: 3rem;
     border-radius: 50%;
     margin-right: 1rem;
   }
 
   &__user-name {
+    font-weight: 600;
   }
 
   &__dropdown {

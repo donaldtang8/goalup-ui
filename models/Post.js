@@ -33,6 +33,9 @@ const PostSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
       },
+      uuid: {
+        type: String
+      },
       text: {
         type: String,
         required: true
