@@ -90,4 +90,26 @@ router.put("/opened/:id", auth, async (req, res) => {
   }
 });
 
+// @route   DELETE api/notification/:id
+// @desc    Delete notification
+// @access  Private
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    let notification = await Notification.findById(req.params.id);
+    // if notification is not owned by req.user.id, user is not authorized
+    if (notification.user_from !== req.user.id) {
+      return res.status(401).json({ msg: "User not authorized" });
+    }
+    const userFrom = await User.findById(req.user.id);
+    // remove notification from user_from's notifications
+    const notifRemoveIndex = userFrom.notifications
+      .map(notif => notif._id)
+      .indexOf(req.params.id);
+    userFrom.notifications.splice(notifRemoveIndex, 1);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;

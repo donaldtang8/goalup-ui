@@ -278,7 +278,7 @@ router.post("/follow_response/:userId/", auth, async (req, res) => {
     // if friend request is accepted
     if (req.body.response === "accept") {
       // create new notification
-      const messageString = userFrom.name + " accepted your friend request";
+      const messageString = userFrom.name + " accepted your follow request";
       const notification = new Notification({
         user_from: req.user.id,
         user_to: req.params.userId,
