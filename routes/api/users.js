@@ -232,6 +232,7 @@ router.post("/follow/:userId", auth, async (req, res) => {
       userTo.follower_received_requests.unshift({ user: req.user.id });
       // add to user_from's follower sent requests
       userFrom.follower_sent_requests.unshift({ user: req.params.userId });
+      // we dont add to user notifications list because friend requests will be in the friend requests list
     }
     await userTo.save();
     await userFrom.save();
@@ -292,20 +293,9 @@ router.post("/follow_response/:userId/", auth, async (req, res) => {
       userFrom.following.unshift({ user: req.params.userId });
       userToProfile.followers.unshift({ user: req.user.id });
       userFromProfile.following.unshift({ user: req.params.userId });
-      // remove requests
-      //remove received request from user's requests
-      const userFromRemoveIndex = userFrom.follower_received_requests
-        .map(follower => follower.user.toString())
-        .indexOf(req.params.userId);
-      userFrom.follower_received_requests.splice(userFromRemoveIndex, 1);
-      // remove sent request from other user's requests
-      const userToRemoveIndex = userTo.follower_sent_requests
-        .map(follow => follow.user.toString())
-        .indexOf(req.user.id);
-      userTo.follower_sent_requests.splice(userToRemoveIndex, 1);
     } else {
       // create new notification
-      const messageString = userFrom.name + " rejected your friend request";
+      const messageString = userFrom.name + " rejected your follow request";
       const notification = new Notification({
         user_from: req.user.id,
         user_to: req.params.userId,
@@ -314,18 +304,19 @@ router.post("/follow_response/:userId/", auth, async (req, res) => {
         message: messageString
       });
       await notification.save();
-      // remove requests
-      //remove received request from user's requests
-      const userFromRemoveIndex = userFrom.follower_received_requests
-        .map(follower => follower.user.toString())
-        .indexOf(req.params.userId);
-      userFrom.follower_received_requests.splice(userFromRemoveIndex, 1);
-      // remove sent request from other user's requests
-      const userToRemoveIndex = userTo.follower_sent_requests
-        .map(follow => follow.user.toString())
-        .indexOf(req.user.id);
-      userTo.follower_sent_requests.splice(userToRemoveIndex, 1);
     }
+    // remove requests
+    //remove received request from user's requests
+    const userFromRemoveIndex = userFrom.follower_received_requests
+      .map(follower => follower.user.toString())
+      .indexOf(req.params.userId);
+    userFrom.follower_received_requests.splice(userFromRemoveIndex, 1);
+    // remove sent request from other user's requests
+    const userToRemoveIndex = userTo.follower_sent_requests
+      .map(follow => follow.user.toString())
+      .indexOf(req.user.id);
+    userTo.follower_sent_requests.splice(userToRemoveIndex, 1);
+
     await userTo.save();
     await userFrom.save();
     res.json(userFrom.follower_received_requests);
