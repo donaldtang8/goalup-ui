@@ -5,15 +5,7 @@ const ProfileSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "user"
   },
-  followers: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user"
-      }
-    }
-  ],
-  following: [
+  friends: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,

@@ -13,14 +13,7 @@ const Post = require("../../models/Post");
 router.get("/me", auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id })
-      .populate("User", [
-        "name",
-        "username",
-        "email",
-        "avatar",
-        "followers",
-        "following"
-      ])
+      .populate("User", ["name", "username", "email", "avatar", "friends"])
       .populate("posts.post");
     if (!profile) {
       return res.status(400).json({ msg: "There is no profile for this user" });
@@ -147,8 +140,7 @@ router.get("/", async (req, res) => {
       "username",
       "email",
       "avatar",
-      "followers",
-      "following",
+      "friends",
       "groups"
     ]);
     res.json(profiles);
@@ -166,14 +158,7 @@ router.get("/user/:user_id", async (req, res) => {
     const profile = await Profile.findOne({
       user: req.params.user_id
     })
-      .populate("user", [
-        "name",
-        "username",
-        "email",
-        "avatar",
-        "followers",
-        "following"
-      ])
+      .populate("user", ["name", "username", "email", "avatar", "friends"])
       .populate("posts.post");
     if (!profile) return res.status(400).json({ msg: "Profile not found" });
     res.json(profile);
@@ -191,26 +176,14 @@ router.get("/user/:user_id", async (req, res) => {
 // @access   Private
 router.delete("/", auth, async (req, res) => {
   try {
-    // for each user
-    // if they are following user to be deleted, remove from their following list
-    // for every user that user to be deleted follows, remove from the followed user's followers list
-
     let self = await User.findOne({ _id: req.user.id });
-    // for each user that deleted user follows, go to that user's follower's list and remove deleted user
-    self.following.map(follow => {
-      let user = User.findOne({ _id: follow.user.toString() });
-      const userRemoveIndex = user.followers
-        .map(follower => follower.user.toString())
+    // for each user that user to be deleted is friends with, delete user to be deleted from their friends list
+    self.friends.map(friend => {
+      let user = User.findOne({ _id: friend.user.toString() });
+      const userRemoveIndex = user.friends
+        .map(friend => friend.user.toString())
         .indexOf(req.user.id);
-      user.followers.splice(userRemoveIndex, 1);
-    });
-    // for each user that follows deleted user, go that user's following list and remove deleted user
-    self.followers.map(follower => {
-      let user = User.findOne({ _id: follower.user.toString() });
-      const userRemoveIndex = user.following
-        .map(follow => follow.user.toString())
-        .indexOf(req.user.id);
-      user.following.splice(userRemoveIndex, 1);
+      user.friends.splice(userRemoveIndex, 1);
     });
 
     self.hasProfile = false;

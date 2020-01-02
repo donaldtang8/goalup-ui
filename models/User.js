@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
   avatar: {
     type: String
   },
-  follower_received_requests: [
+  friend_received_requests: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema({
       }
     }
   ],
-  follower_sent_requests: [
+  friend_sent_requests: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -38,15 +38,7 @@ const UserSchema = new mongoose.Schema({
       }
     }
   ],
-  followers: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user"
-      }
-    }
-  ],
-  following: [
+  friends: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,

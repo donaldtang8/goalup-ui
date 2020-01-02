@@ -166,72 +166,64 @@ router.post(
   }
 );
 
-// @route   POST api/users/follow/:userId
-// @desc    Follow or unfollow other users by id
+// @route   POST api/users/friend/:userId
+// @desc    friend or unfriend other users by id
 // @access  Public
-router.post("/follow/:userId", auth, async (req, res) => {
+router.post("/friend/:userId", auth, async (req, res) => {
   try {
     // see if user exists
     let userFrom = await User.findById(req.user.id).select("-password");
     let userTo = await User.findById(req.params.userId).select("-password");
     let userToProfile = await Profile.findOne({
       user: req.params.userId
-    }).populate("user", [
-      "name",
-      "username",
-      "email",
-      "avatar",
-      "followers",
-      "following"
-    ]);
+    }).populate("user", ["name", "username", "email", "avatar", "friends"]);
     let userFromProfile = await Profile.findOne({ user: req.user.id });
 
     if (!userTo || !userToProfile) {
       return res.status(400).json({ errors: [{ msg: "User does not exist" }] });
     }
 
-    // if following user already
+    // if friends with user already
     if (
-      userTo.followers.filter(
-        follower => follower.user.toString() === req.user.id
-      ).length > 0
+      userTo.friends.filter(friend => friend.user.toString() === req.user.id)
+        .length > 0
     ) {
-      //remove self from user.followers
-      const userToRemoveIndex = userTo.followers
-        .map(follower => follower.user.toString())
+      //remove self from user's friends list
+      const userToRemoveIndex = userTo.friends
+        .map(friend => friend.user.toString())
         .indexOf(req.user.id);
-      userTo.followers.splice(userToRemoveIndex, 1);
-      // remove user from self.following
-      const userFromRemoveIndex = userFrom.following
-        .map(follow => follow.user.toString())
+      userTo.friends.splice(userToRemoveIndex, 1);
+      // remove user from self's friends list
+      const userFromRemoveIndex = userFrom.friends
+        .map(friend => friend.user.toString())
         .indexOf(req.params.userId);
-      userFrom.following.splice(userFromRemoveIndex, 1);
-      // remove follower from user's profile
-      const userToProfileRemoveIndex = userToProfile.followers
-        .map(follower => follower.user.toString())
+      userFrom.friends.splice(userFromRemoveIndex, 1);
+      // remove self from user's profile friend's list
+      const userToProfileRemoveIndex = userToProfile.friends
+        .map(friend => friend.user.toString())
         .indexOf(req.user.id);
-      userToProfile.followers.splice(userToProfileRemoveIndex, 1);
-      // remove user from self profile
-      const userFromProfileRemoveIndex = userFromProfile.followers
-        .map(follower => follower.user.toString())
+      userToProfile.friends.splice(userToProfileRemoveIndex, 1);
+      // remove user from self's profile friend's list
+      const userFromProfileRemoveIndex = userFromProfile.friends
+        .map(friend => friend.user.toString())
         .indexOf(req.params.userId);
-      userFromProfile.following.splice(userFromProfileRemoveIndex, 1);
+      userFromProfile.friends.splice(userFromProfileRemoveIndex, 1);
     } else {
-      // otherwise if not following
-      // create new notification for follow request
-      const messageString = userFrom.name + " sent you a follow request";
+      // otherwise if not friending
+      // create new notification for friend request
+      const messageString = userFrom.name + " sent you a friend request";
       const notification = new Notification({
         user_from: req.user.id,
         user_to: req.params.userId,
         item_id: req.params.userId,
-        action: "follow",
+        action: "friend_request",
         message: messageString
       });
       await notification.save();
-      // add to user_to's follower received requests
-      userTo.follower_received_requests.unshift({ user: req.user.id });
-      // add to user_from's follower sent requests
-      userFrom.follower_sent_requests.unshift({ user: req.params.userId });
+      // add to user_to's friender received requests
+      userTo.friend_received_requests.unshift({ user: req.user.id });
+      // add to user_from's friender sent requests
+      userFrom.friend_sent_requests.unshift({ user: req.params.userId });
       // we dont add to user notifications list because friend requests will be in the friend requests list
     }
     await userTo.save();
@@ -240,7 +232,7 @@ router.post("/follow/:userId", auth, async (req, res) => {
     await userFromProfile.save();
     res.json(userToProfile);
     // res.json({
-    //   follow: [{ followers: user.followers }, { following: user.following }]
+    //   friend: [{ frienders: user.frienders }, { friending: user.friending }]
     // });
   } catch (err) {
     console.log(err.message);
@@ -248,30 +240,23 @@ router.post("/follow/:userId", auth, async (req, res) => {
   }
 });
 
-// @route   POST api/users/follow_response/:userId/:response
-// @desc    Follow or unfollow other users by id
+// @route   POST api/users/friend_response/:userId/:response
+// @desc    friend or unfriend other users by id
 // @access  Private
-router.post("/follow_response/:userId/", auth, async (req, res) => {
+router.post("/friend_response/:userId/", auth, async (req, res) => {
   try {
     let userFrom = await User.findById(req.user.id).select("-password");
     let userTo = await User.findById(req.params.userId).select("-password");
     let userToProfile = await Profile.findOne({
       user: req.params.userId
-    }).populate("user", [
-      "name",
-      "username",
-      "email",
-      "avatar",
-      "followers",
-      "following"
-    ]);
+    }).populate("user", ["name", "username", "email", "avatar", "friends"]);
     let userFromProfile = await Profile.findOne({ user: req.user.id });
     // check if there is a request from userTo to userFrom
-    // to do this, we should check userId's follower_sent_requests and see if req.user.id is in there
+    // to do this, we should check userId's friender_sent_requests and see if req.user.id is in there
     // if not there, user is not authorized to respond to request
     if (
-      userTo.follower_sent_requests.filter(
-        follower => follower.user.toString() === req.user.id
+      userTo.friend_sent_requests.filter(
+        friend => friend.user.toString() === req.user.id
       ).length === 0
     ) {
       return res.status(400).json({ errors: [{ msg: "User not authorized" }] });
@@ -279,47 +264,47 @@ router.post("/follow_response/:userId/", auth, async (req, res) => {
     // if friend request is accepted
     if (req.body.response === "accept") {
       // create new notification
-      const messageString = userFrom.name + " accepted your follow request";
+      const messageString = userFrom.name + " accepted your friend request";
       const notification = new Notification({
         user_from: req.user.id,
         user_to: req.params.userId,
         item_id: req.params.userId,
-        action: "follow_response",
+        action: "friend_response",
         message: messageString
       });
       await notification.save();
       // unshift will add user to the front of the likes array of post
-      userTo.followers.unshift({ user: req.user.id });
-      userFrom.following.unshift({ user: req.params.userId });
-      userToProfile.followers.unshift({ user: req.user.id });
-      userFromProfile.following.unshift({ user: req.params.userId });
+      userTo.friends.unshift({ user: req.user.id });
+      userFrom.friends.unshift({ user: req.params.userId });
+      userToProfile.friends.unshift({ user: req.user.id });
+      userFromProfile.friends.unshift({ user: req.params.userId });
     } else {
       // create new notification
-      const messageString = userFrom.name + " rejected your follow request";
+      const messageString = userFrom.name + " rejected your friend request";
       const notification = new Notification({
         user_from: req.user.id,
         user_to: req.params.userId,
         item_id: req.params.userId,
-        action: "follow_response",
+        action: "friend_response",
         message: messageString
       });
       await notification.save();
     }
     // remove requests
     //remove received request from user's requests
-    const userFromRemoveIndex = userFrom.follower_received_requests
-      .map(follower => follower.user.toString())
+    const userFromRemoveIndex = userFrom.friend_received_requests
+      .map(friend => friend.user.toString())
       .indexOf(req.params.userId);
-    userFrom.follower_received_requests.splice(userFromRemoveIndex, 1);
+    userFrom.friend_received_requests.splice(userFromRemoveIndex, 1);
     // remove sent request from other user's requests
-    const userToRemoveIndex = userTo.follower_sent_requests
-      .map(follow => follow.user.toString())
+    const userToRemoveIndex = userTo.friend_sent_requests
+      .map(friend => friend.user.toString())
       .indexOf(req.user.id);
-    userTo.follower_sent_requests.splice(userToRemoveIndex, 1);
+    userTo.friend_sent_requests.splice(userToRemoveIndex, 1);
 
     await userTo.save();
     await userFrom.save();
-    res.json(userFrom.follower_received_requests);
+    res.json(userFrom.friend_received_requests);
   } catch (err) {
     console.log(err.message);
     res.status(500).send("Server error");
