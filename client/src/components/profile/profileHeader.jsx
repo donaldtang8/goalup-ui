@@ -2,7 +2,7 @@ import React from "react";
 
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import { followUserById } from "../../redux/actions/profiles";
+import { sendFriendRequest, unfriend } from "../../redux/actions/users";
 
 import Moment from "react-moment";
 import PropTypes from "prop-types";
@@ -10,18 +10,19 @@ import sprite from "../../assets/img/sprite.svg";
 
 const ProfileHeader = ({
   auth,
-  followUserById,
+  sendFriendRequest,
+  unfriend,
   profile: {
     bio,
     location,
     status,
     goal,
-    followers,
-    following,
     social,
     date,
+    friends,
     user: { _id, name, username, avatar }
-  }
+  },
+  user: { friend_sent_requests, friend_received_requests }
 }) => {
   return (
     <div className="profile-container__header">
@@ -38,19 +39,29 @@ const ProfileHeader = ({
           <div className="profile-container__header--actions">
             <div className="profile-container__header--actions-item">
               {_id !== auth.user._id ? (
-                followers.find(follower => follower.user === auth.user._id) ? (
+                friends.find(friend => friend.user === auth.user._id) ? (
                   <div
                     className="btn-small btn-small--primary"
-                    onClick={() => followUserById(_id)}
+                    onClick={() => unfriend(_id)}
                   >
-                    Unfollow
+                    Unfriend
+                  </div>
+                ) : friend_received_requests.find(
+                    friend => friend.user === _id
+                  ) ? (
+                  <Link to="/friends" className="btn-small btn-small--primary">
+                    Respond to Request
+                  </Link>
+                ) : friend_sent_requests.find(friend => friend.user === _id) ? (
+                  <div className="btn-small btn-small--primary">
+                    Sent Request
                   </div>
                 ) : (
                   <div
                     className="btn-small btn-small--primary"
-                    onClick={() => followUserById(_id)}
+                    onClick={() => sendFriendRequest(_id)}
                   >
-                    Follow
+                    Friend
                   </div>
                 )
               ) : (
@@ -84,12 +95,8 @@ const ProfileHeader = ({
           </div>
           <div className="profile-container__header--bio-item">
             <div className="profile-container__header--followers">
-              <div className="bold">{followers.length} </div>
-              <div className="padding-small">Followers</div>
-            </div>
-            <div className="profile-container__header--following">
-              <div className="bold">{following.length} </div>
-              <div className="padding-small"> Following</div>
+              <div className="bold">{friends.length} </div>
+              <div className="padding-small">Friends</div>
             </div>
           </div>
         </div>
@@ -101,11 +108,15 @@ const ProfileHeader = ({
 
 ProfileHeader.propTypes = {
   profile: PropTypes.object.isRequired,
-  followUserById: PropTypes.func.isRequired
+  sendFriendRequest: PropTypes.func.isRequired,
+  unfriend: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  auth: state.auth
+  auth: state.auth,
+  user: state.auth.user
 });
 
-export default connect(mapStateToProps, { followUserById })(ProfileHeader);
+export default connect(mapStateToProps, { sendFriendRequest, unfriend })(
+  ProfileHeader
+);

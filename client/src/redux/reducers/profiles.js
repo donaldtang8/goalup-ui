@@ -3,8 +3,8 @@ import {
   GET_PROFILES,
   UPDATE_PROFILE,
   CLEAR_PROFILE,
-  FOLLOW_PROFILE,
-  PROFILE_ERROR
+  PROFILE_ERROR,
+  UNFRIEND
 } from "../actions/types";
 
 const initialState = {
@@ -25,23 +25,17 @@ export default function(state = initialState, action) {
       return { ...state, profiles: payload, loading: false, error: {} };
     case CLEAR_PROFILE:
       return { ...state, profile: null, loading: false };
-    case FOLLOW_PROFILE:
-      return {
-        ...state,
-        profile: payload.profile,
-        profiles: state.profiles.map(profile =>
-          profile.user._id === payload.userId
-            ? {
-                ...profile,
-                followers: payload.profile.followers
-                // user: { ...profile.user, followers: payload.followers }
-              }
-            : profile
-        ),
-        loading: false
-      };
     case PROFILE_ERROR:
       return { ...state, profile: null, error: payload, loading: false };
+    case UNFRIEND:
+      return {
+        ...state,
+        profile: {
+          ...state.profile,
+          friends: payload.friends
+        },
+        loading: false
+      };
     default:
       return state;
   }

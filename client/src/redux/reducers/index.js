@@ -7,6 +7,7 @@ import alert from "./alert";
 import posts from "./posts";
 import profiles from "./profiles";
 import groups from "./groups";
+import notifications from "./notifications";
 
 const persistConfig = {
   key: "root",
@@ -17,6 +18,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: auth,
   alert: alert,
+  notifications: notifications,
   posts: posts,
   profiles: profiles,
   groups: groups

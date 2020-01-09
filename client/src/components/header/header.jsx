@@ -65,10 +65,15 @@ const Header = ({
             <use xlinkHref={`${sprite}#icon-home`}></use>
           </svg>
         </Link>
-        <Link to="/profiles" className="user-nav__icon-box">
+        <Link to="/friends" className="user-nav__icon-box">
           <svg className="user-nav__icon">
             <use xlinkHref={`${sprite}#icon-users`}></use>
           </svg>
+          <span className="user-nav__notification">
+            {user && user.friend_received_requests.length > 0
+              ? user.friend_received_requests.length
+              : 0}
+          </span>
         </Link>
         <Link to="/groups" className="user-nav__icon-box">
           <svg className="user-nav__icon">
@@ -91,7 +96,11 @@ const Header = ({
           <svg className="user-nav__icon">
             <use xlinkHref={`${sprite}#icon-bookmark`}></use>
           </svg>
-          <span className="user-nav__notification">7</span>
+          <span className="user-nav__notification">
+            {user && user.notifications.length > 0
+              ? user.notifications.length
+              : 0}
+          </span>
         </div>
         <div className="user-nav__user" onClick={() => toggleDropdown()}>
           <img

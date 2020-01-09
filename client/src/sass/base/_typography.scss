@@ -69,10 +69,15 @@ body {
 
 .paragraph {
   font-size: $default-font-size;
+  color: var(--color-light);
 
   &:not(:last-child) {
     margin-bottom: 3rem;
   }
+}
+
+.center {
+  text-align: center;
 }
 
 a {

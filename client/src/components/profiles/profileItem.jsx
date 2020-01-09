@@ -2,23 +2,25 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { followUserById } from "../../redux/actions/profiles";
+import { sendFriendRequest, unfriend } from "../../redux/actions/users";
+
 import PropTypes from "prop-types";
 
 import sprite from "../../assets/img/sprite.svg";
 
 const ProfileItem = ({
   auth,
-  followUserById,
+  sendFriendRequest,
   profile: {
     user: { _id, name, username, avatar, groups },
     bio,
     location,
-    followers,
+    friends,
     status,
     hobbies,
     interests
-  }
+  },
+  user: { friend_sent_requests, friend_received_requests }
 }) => (
   <div className="profileItem">
     <div className="profileItem__header">
@@ -33,7 +35,7 @@ const ProfileItem = ({
     <div className="profileItem__main">
       <div className="profileItem__details">
         <div className="profileItem__details--item">
-          Followers: {followers.length}
+          Friends: {friends.length}
         </div>
         <div className="profileItem__details--item">
           Groups: {groups.length}
@@ -62,21 +64,35 @@ const ProfileItem = ({
       <div className="profileItem__actions">
         <div className="profileItem__actions--item">
           {_id !== auth.user._id &&
-            (followers.find(follower => follower.user === auth.user._id) ? (
+            friends.find(friend => friend.user === auth.user._id) && (
               <div
                 className="btn-small btn-small--primary"
-                onClick={() => followUserById(_id)}
+                onClick={() => unfriend(_id)}
               >
-                Unfollow
+                Unfriend
               </div>
-            ) : (
+            )}
+          {_id !== auth.user._id &&
+            friend_received_requests.find(friend => friend.user === _id) && (
+              <Link to="/friends" className="btn-small btn-small--primary">
+                Respond to Request
+              </Link>
+            )}
+          {_id !== auth.user._id &&
+            friend_sent_requests.find(friend => friend.user === _id) && (
+              <div className="btn-small btn-small--primary">Sent Request</div>
+            )}
+          {_id !== auth.user._id &&
+            !friend_received_requests.find(friend => friend.user === _id) &&
+            !friend_sent_requests.find(friend => friend.user === _id) &&
+            !friends.find(friend => friend.user === auth.user._id) && (
               <div
                 className="btn-small btn-small--primary"
-                onClick={() => followUserById(_id)}
+                onClick={() => sendFriendRequest(_id)}
               >
-                Follow
+                Friend
               </div>
-            ))}
+            )}
         </div>
       </div>
     </div>
@@ -85,12 +101,13 @@ const ProfileItem = ({
 
 ProfileItem.propTypes = {
   profile: PropTypes.object.isRequired,
-  followUserById: PropTypes.func.isRequired
+  sendFriendRequest: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
   auth: state.auth,
+  user: state.auth.user,
   profiles: state.profiles
 });
 
-export default connect(mapStateToProps, { followUserById })(ProfileItem);
+export default connect(mapStateToProps, { sendFriendRequest })(ProfileItem);

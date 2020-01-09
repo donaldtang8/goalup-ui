@@ -129,6 +129,9 @@ router.put("/like/:id", auth, async (req, res) => {
     const userFrom = await User.findById(req.user.id).select("-password");
     const userTo = await User.findById(post.user).select("-password");
 
+    console.log(userTo);
+    console.log(userTo.notifications);
+
     // Check if the post has already been liked
     // filter through the likes to see if current iteration of user is the one thats logged in
     // this will only return something if theres a match, so if > 0 that means user has already liked the post
@@ -164,11 +167,11 @@ router.put("/like/:id", auth, async (req, res) => {
         action: "like",
         message: messageString
       });
-
+      console.log(1);
       // add notification to user
       userTo.notifications.unshift(newNotification);
       await newNotification.save();
-
+      console.log(2);
       // unshift will add user to the front of the likes array of post
       post.likes.unshift({ user: req.user.id });
     }

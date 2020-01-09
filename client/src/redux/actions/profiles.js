@@ -5,7 +5,6 @@ import {
   GET_PROFILE,
   GET_PROFILES,
   CLEAR_PROFILE,
-  FOLLOW_PROFILE,
   PROFILE_ERROR,
   ACCOUNT_DELETED
 } from "./types";
@@ -51,22 +50,6 @@ export const getProfileById = userId => async dispatch => {
     dispatch({
       type: GET_PROFILE,
       payload: res.data
-    });
-  } catch (err) {
-    dispatch({
-      type: PROFILE_ERROR,
-      payload: { msg: err.response.statusText, status: err.response.status }
-    });
-  }
-};
-
-// Follow user by id
-export const followUserById = userId => async dispatch => {
-  try {
-    const res = await axios.post(`/api/users/follow/${userId}`);
-    dispatch({
-      type: FOLLOW_PROFILE,
-      payload: { userId, profile: res.data }
     });
   } catch (err) {
     dispatch({

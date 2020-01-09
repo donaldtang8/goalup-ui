@@ -7,7 +7,10 @@ import {
   LOGIN_FAIL,
   LOGOUT,
   ACCOUNT_DELETED,
-  TOGGLE_DROPDOWN
+  TOGGLE_DROPDOWN,
+  FRIEND_REQUEST,
+  FRIEND_RESPOND,
+  UNFRIEND
 } from "../actions/types";
 
 const initialState = {
@@ -40,6 +43,33 @@ export default function(state = initialState, action) {
       return { ...state, token: null, isAuthenticated: false, loading: false };
     case TOGGLE_DROPDOWN:
       return { ...state, showUserDropdown: !state.showUserDropdown };
+    case FRIEND_REQUEST:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          friend_sent_requests: payload.requests
+        },
+        loading: false
+      };
+    case FRIEND_RESPOND:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          friend_received_requests: payload.requests
+        },
+        loading: false
+      };
+    case UNFRIEND:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          friends: payload.friends
+        },
+        loading: false
+      };
     case REGISTER_SUCCESS:
     case LOGIN_SUCCESS:
       localStorage.setItem("token", payload.token);

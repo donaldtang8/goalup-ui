@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect } from "react";
 import { connect } from "react-redux";
-import { getProfileById, followUserById } from "../../redux/actions/profiles";
+import { getProfileById } from "../../redux/actions/profiles";
 
 import ProfileHeader from "../../components/profile/profileHeader";
 import ProfileBody from "../../components/profile/profileBody";
@@ -9,7 +9,6 @@ import PropTypes from "prop-types";
 
 const Profile = ({
   getProfileById,
-  followUserById,
   auth,
   match,
   history,
@@ -34,8 +33,7 @@ const Profile = ({
 };
 
 Profile.propTypes = {
-  getProfileById: PropTypes.func.isRequired,
-  followUserById: PropTypes.func.isRequired
+  getProfileById: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -43,6 +41,4 @@ const mapStateToProps = state => ({
   profiles: state.profiles
 });
 
-export default connect(mapStateToProps, { getProfileById, followUserById })(
-  Profile
-);
+export default connect(mapStateToProps, { getProfileById })(Profile);

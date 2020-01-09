@@ -28,7 +28,7 @@ const CreateProfilePage = lazy(() => import("./pages/forms/createProfile"));
 const EditProfilePage = lazy(() => import("./pages/forms/editProfile"));
 const CreateGroupPage = lazy(() => import("./pages/forms/createGroup"));
 const EditGroupPage = lazy(() => import("./pages/forms/editGroup"));
-const TestPage = lazy(() => import("./pages/test/test"));
+const FriendsPage = lazy(() => import("./pages/friends/friendsContainer"));
 
 const App = ({ loadUser, auth }) => {
   useEffect(() => {
@@ -78,7 +78,7 @@ const App = ({ loadUser, auth }) => {
                     path="/group/:id/edit-group"
                     component={EditGroupPage}
                   />
-                  <PrivateRoute exact path="/test" component={TestPage} />
+                  <PrivateRoute exact path="/friends" component={FriendsPage} />
                 </main>
               </div>
             ) : (
