@@ -190,31 +190,43 @@ router.post("/friend/:userId", auth, async (req, res) => {
       return res.status(400).json({ errors: [{ msg: "User does not exist" }] });
     }
 
-    const messageString = userFrom.name + " sent you a friend request";
-    const notification = new Notification({
-      user_from: req.user.id,
-      user_to: req.params.userId,
-      item_id: req.params.userId,
-      action: "friend_request",
-      message: messageString
-    });
-    await notification.save();
-    // add to user_to's friender received requests
-    userTo.friend_received_requests.unshift({
-      user: req.user.id,
-      name: userFrom.name,
-      username: userFrom.username,
-      email: userFrom.email,
-      avatar: userFrom.avatar
-    });
-    // add to user_from's friender sent requests
-    userFrom.friend_sent_requests.unshift({
-      user: req.params.userId,
-      name: userTo.name,
-      username: userTo.username,
-      email: userTo.email,
-      avatar: userTo.avatar
-    });
+    // if already sent request to or received request from the user already, return error
+    if (
+      userFrom.friend_received_requests.filter(
+        friend => friend.user.toString() === req.params.userId
+      ).length > 0 ||
+      userFrom.friend_sent_requests.filter(
+        friend => friend.user.toString() === req.params.userId
+      ).length > 0
+    ) {
+      return res.status(400).json({ errors: [{ msg: "Already requested" }] });
+    } else {
+      const messageString = userFrom.name + " sent you a friend request";
+      const notification = new Notification({
+        user_from: req.user.id,
+        user_to: req.params.userId,
+        item_id: req.params.userId,
+        action: "friend_request",
+        message: messageString
+      });
+      await notification.save();
+      // add to user_to's friender received requests
+      userTo.friend_received_requests.unshift({
+        user: req.user.id,
+        name: userFrom.name,
+        username: userFrom.username,
+        email: userFrom.email,
+        avatar: userFrom.avatar
+      });
+      // add to user_from's friender sent requests
+      userFrom.friend_sent_requests.unshift({
+        user: req.params.userId,
+        name: userTo.name,
+        username: userTo.username,
+        email: userTo.email,
+        avatar: userTo.avatar
+      });
+    }
 
     await userTo.save();
     await userFrom.save();
