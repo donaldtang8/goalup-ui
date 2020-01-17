@@ -20,13 +20,7 @@ export default function(state = initialState, action) {
     case GET_NOTIFICATIONS:
       return {
         ...state,
-        posts: payload,
-        loading: false
-      };
-    case ADD_NOTIFICATION:
-      return {
-        ...state,
-        posts: [payload, ...state.posts],
+        notifications: payload,
         loading: false
       };
     case REMOVE_NOTIFICATION:

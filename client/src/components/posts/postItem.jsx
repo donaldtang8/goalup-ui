@@ -8,6 +8,7 @@ import sprite from "../../assets/img/sprite.svg";
 import {
   removePost,
   addLike,
+  removeLike,
   addComment,
   removeComment,
   addLikeComment
@@ -30,6 +31,7 @@ const PostItem = ({
   group,
   removePost,
   addLike,
+  removeLike,
   addComment,
   removeComment,
   addLikeComment,
@@ -61,8 +63,8 @@ const PostItem = ({
       <div className="postItem__header">
         <div className="postItem__header--user">
           {auth && auth.user && (
-            <Link to={`/profiles/${auth.user._id}`}>
-              <img src={avatar} alt={user} className="postItem__header--img" />
+            <Link to={`/profiles/${user}`}>
+              <img src={avatar} alt={name} className="postItem__header--img" />
             </Link>
           )}
           <div className="postItem__header--block">
@@ -78,7 +80,11 @@ const PostItem = ({
         <div
           className="postItem__actions--button"
           onClick={() => {
-            medium === "post" ? addLike(_id) : addGroupLike(_id);
+            medium === "post"
+              ? likes.find(like => like.user === auth.user._id)
+                ? removeLike(_id)
+                : addLike(_id)
+              : addGroupLike(_id);
           }}
         >
           {auth.user && (
@@ -166,11 +172,6 @@ const PostItem = ({
                           ? "postItem__comments--action--heart"
                           : "postItem__comments--action"
                       }
-                      onClick={() => {
-                        medium === "post"
-                          ? addLikeComment(_id, comment._id)
-                          : addGroupLikeComment(_id);
-                      }}
                     >
                       <use xlinkHref={`${sprite}#icon-heart`}></use>
                     </svg>
@@ -237,6 +238,7 @@ PostItem.propTypes = {
   group: PropTypes.object,
   removePost: PropTypes.func.isRequired,
   addLike: PropTypes.func.isRequired,
+  removeLike: PropTypes.func.isRequired,
   addComment: PropTypes.func.isRequired,
   removeComment: PropTypes.func.isRequired,
   addLikeComment: PropTypes.func.isRequired,
@@ -255,6 +257,7 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   removePost,
   addLike,
+  removeLike,
   addComment,
   removeComment,
   addLikeComment,

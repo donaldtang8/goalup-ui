@@ -18,12 +18,7 @@ router.get("/", auth, async (req, res) => {
   try {
     const user = await (
       await User.findById(req.user.id).select("-password")
-    ).populate("friends_received_requests", [
-      "name",
-      "username",
-      "email",
-      "avatar"
-    ]);
+    ).populate("notifications.user_from");
     res.json(user);
   } catch (err) {
     console.error(err.message);
@@ -181,12 +176,8 @@ router.post("/friend/:userId", auth, async (req, res) => {
     // see if user exists
     let userFrom = await User.findById(req.user.id).select("-password");
     let userTo = await User.findById(req.params.userId).select("-password");
-    let userToProfile = await Profile.findOne({
-      user: req.params.userId
-    }).populate("user", ["name", "username", "email", "avatar", "friends"]);
-    let userFromProfile = await Profile.findOne({ user: req.user.id });
 
-    if (!userTo || !userToProfile) {
+    if (!userTo) {
       return res.status(400).json({ errors: [{ msg: "User does not exist" }] });
     }
 
@@ -201,15 +192,15 @@ router.post("/friend/:userId", auth, async (req, res) => {
     ) {
       return res.status(400).json({ errors: [{ msg: "Already requested" }] });
     } else {
-      const messageString = userFrom.name + " sent you a friend request";
-      const notification = new Notification({
-        user_from: req.user.id,
-        user_to: req.params.userId,
-        item_id: req.params.userId,
-        action: "friend_request",
-        message: messageString
-      });
-      await notification.save();
+      //   const messageString = userFrom.name + " sent you a friend request";
+      //   const notification = new Notification({
+      //     user_from: req.user.id,
+      //     user_to: req.params.userId,
+      //     item_id: req.params.userId,
+      //     action: "friend_request",
+      //     message: messageString
+      //   });
+      //   await notification.save();
       // add to user_to's friender received requests
       userTo.friend_received_requests.unshift({
         user: req.user.id,
@@ -230,8 +221,6 @@ router.post("/friend/:userId", auth, async (req, res) => {
 
     await userTo.save();
     await userFrom.save();
-    await userToProfile.save();
-    await userFromProfile.save();
     res.json(userFrom.friend_sent_requests);
   } catch (err) {
     console.log(err.message);
@@ -263,15 +252,15 @@ router.post("/friendResponse/:userId/", auth, async (req, res) => {
     // if friend request is accepted
     if (req.body.response === "accept") {
       // create new notification
-      const messageString = userFrom.name + " accepted your friend request";
-      const notification = new Notification({
-        user_from: req.user.id,
-        user_to: req.params.userId,
-        item_id: req.params.userId,
-        action: "friend_response",
-        message: messageString
-      });
-      await notification.save();
+      // const messageString = userFrom.name + " accepted your friend request";
+      // const notification = new Notification({
+      //   user_from: req.user.id,
+      //   user_to: req.params.userId,
+      //   item_id: req.params.userId,
+      //   action: "friend_response",
+      //   message: messageString
+      // });
+      // await notification.save();
       // unshift will add user to the front of the likes array of post
       userTo.friends.unshift({ user: req.user.id });
       userFrom.friends.unshift({ user: req.params.userId });
@@ -279,15 +268,15 @@ router.post("/friendResponse/:userId/", auth, async (req, res) => {
       userFromProfile.friends.unshift({ user: req.params.userId });
     } else {
       // create new notification
-      const messageString = userFrom.name + " rejected your friend request";
-      const notification = new Notification({
-        user_from: req.user.id,
-        user_to: req.params.userId,
-        item_id: req.params.userId,
-        action: "friend_response",
-        message: messageString
-      });
-      await notification.save();
+      // const messageString = userFrom.name + " rejected your friend request";
+      // const notification = new Notification({
+      //   user_from: req.user.id,
+      //   user_to: req.params.userId,
+      //   item_id: req.params.userId,
+      //   action: "friend_response",
+      //   message: messageString
+      // });
+      // await notification.save();
     }
     // remove requests
     //remove received request from user's requests

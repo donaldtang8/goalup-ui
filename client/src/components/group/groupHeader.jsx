@@ -1,6 +1,7 @@
 import React from "react";
 
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 import { joinGroupById } from "../../redux/actions/groups";
 
 import Moment from "react-moment";
@@ -56,7 +57,12 @@ const GroupHeader = ({
                   </div>
                 )
               ) : (
-                <div className="btn-small btn-small--primary">Edit group</div>
+                <Link
+                  to={`/group/${_id}/edit-group`}
+                  className="btn-small btn-small--primary"
+                >
+                  Edit group
+                </Link>
               )}
             </div>
           </div>

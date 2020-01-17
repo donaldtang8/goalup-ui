@@ -66,12 +66,12 @@ export default function(state = initialState, action) {
             ? { ...post, comments: payload.comments }
             : post
         ),
-        post: {
-          ...state.post,
-          comments: state.post.comments.filter(
-            comment => comment._id !== payload
-          )
-        },
+        // post: {
+        //   ...state.post,
+        //   comments: state.post.comments.filter(
+        //     comment => comment._id !== payload
+        //   )
+        // },
         loading: false
       };
     case UPDATE_COMMENT_LIKES:

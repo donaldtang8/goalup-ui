@@ -83,6 +83,42 @@ const UserSchema = new mongoose.Schema({
       notification: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "notification"
+      },
+      user: {
+        userId: mongoose.Schema.Types.ObjectId,
+        avatar: {
+          type: String
+        },
+        name: {
+          type: String
+        },
+        username: {
+          type: String
+        },
+        email: {
+          type: String
+        }
+      },
+      item_id: {
+        type: mongoose.Schema.Types.ObjectId
+      },
+      uuid: {
+        type: String
+      },
+      action: {
+        type: String
+      },
+      message: {
+        type: String,
+        required: true
+      },
+      viewed: {
+        type: Boolean,
+        default: false
+      },
+      opened: {
+        type: Boolean,
+        default: false
       }
     }
   ],

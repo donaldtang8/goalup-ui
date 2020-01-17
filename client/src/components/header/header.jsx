@@ -10,6 +10,8 @@ import {
 
 import PropTypes from "prop-types";
 
+import { getUserNotifications } from "../../redux/actions/notifications";
+
 import AutosuggestSearch from "../autosuggest/autosuggest";
 
 import logo from "../../assets/img/logo.png";
@@ -17,19 +19,25 @@ import sprite from "../../assets/img/sprite.svg";
 
 const Header = ({
   auth: { isAuthenticated, user, showUserDropdown, loading, errors },
+  notifications: { notifications },
+  getUserNotifications,
+  loadUser,
   login,
   logout,
   toggleDropdown,
   history
 }) => {
   useEffect(() => {
+    getUserNotifications();
     loadUser();
-  }, [loadUser]);
+  }, [getUserNotifications, loadUser]);
 
   const [userCredentials, setCredentials] = useState({
     email: "",
     password: ""
   });
+
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const { email, password } = userCredentials;
 
@@ -69,16 +77,11 @@ const Header = ({
           <svg className="user-nav__icon">
             <use xlinkHref={`${sprite}#icon-users`}></use>
           </svg>
-          <span className="user-nav__notification">
-            {user && user.friend_received_requests.length > 0
-              ? user.friend_received_requests.length
-              : 0}
-          </span>
-        </Link>
-        <Link to="/groups" className="user-nav__icon-box">
-          <svg className="user-nav__icon">
-            <use xlinkHref={`${sprite}#icon-mask`}></use>
-          </svg>
+          {user && user.friend_received_requests.length > 0 && (
+            <span className="user-nav__notification">
+              {user.friend_received_requests.length}
+            </span>
+          )}
         </Link>
         <div
           className="user-nav__icon-box"
@@ -87,21 +90,22 @@ const Header = ({
           <svg className="user-nav__icon">
             <use xlinkHref={`${sprite}#icon-message`}></use>
           </svg>
-          <span className="user-nav__notification">7</span>
+          {/* <span className="user-nav__notification">0</span> */}
         </div>
-        <div
+        <Link
+          to="/notifications"
           className="user-nav__icon-box"
-          onClick={() => alert("Feature coming soon")}
+          onClick={() => setShowNotifications(!showNotifications)}
         >
           <svg className="user-nav__icon">
             <use xlinkHref={`${sprite}#icon-bookmark`}></use>
           </svg>
-          <span className="user-nav__notification">
-            {user && user.notifications.length > 0
-              ? user.notifications.length
-              : 0}
-          </span>
-        </div>
+          {notifications && notifications.length > 0 && (
+            <span className="user-nav__notification">
+              {notifications.length}
+            </span>
+          )}
+        </Link>
         <div className="user-nav__user" onClick={() => toggleDropdown()}>
           <img
             src={user.avatar}
@@ -111,11 +115,12 @@ const Header = ({
           <span className="user-nav__user-name">{user.name}</span>
         </div>
       </nav>
+
       <div
         className={
           showUserDropdown
-            ? "user-nav__dropdown"
-            : "user-nav__dropdown user-nav__dropdown--hidden"
+            ? "user-nav__dropdown user-nav__dropdown--user"
+            : "user-nav__dropdown user-nav__dropdown--user user-nav__dropdown--hidden"
         }
       >
         <ul>
@@ -194,10 +199,12 @@ Header.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  auth: state.auth
+  auth: state.auth,
+  notifications: state.notifications
 });
 
 export default connect(mapStateToProps, {
+  getUserNotifications,
   loadUser,
   login,
   logout,

@@ -59,10 +59,9 @@
 
   &__dropdown {
     position: absolute;
-    top: 6.5vh;
-    right: 0.5em;
     height: 10rem;
     width: 12.5rem;
+    top: 6.5vh;
     overflow: hidden;
     box-shadow: 0 1rem 2rem rgba(var(--color-dark), 0.15);
     border-radius: 0.5em;
@@ -72,6 +71,14 @@
 
     &--hidden {
       display: none;
+    }
+
+    &--notifications {
+      right: 2rem;
+    }
+
+    &--user {
+      right: 0.5rem;
     }
 
     ul {

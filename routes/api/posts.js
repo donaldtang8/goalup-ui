@@ -129,34 +129,39 @@ router.put("/like/:id", auth, async (req, res) => {
     const userFrom = await User.findById(req.user.id).select("-password");
     const userTo = await User.findById(post.user).select("-password");
 
-    console.log(userTo);
-    console.log(userTo.notifications);
-
     // Check if the post has already been liked
     // filter through the likes to see if current iteration of user is the one thats logged in
     // this will only return something if theres a match, so if > 0 that means user has already liked the post
     if (
       post.likes.filter(like => like.user.toString() === req.user.id).length > 0
     ) {
-      // find and remove notification
-      const notification = await Notification.findOne({
-        item_id: req.params.id,
-        action: "like"
-      });
-      const notifId = notification._id;
-      await notification.remove();
-
-      // remove notification from user's notifications
-      const removeNotifIndex = userTo.notifications
-        .map(notif => notif._id)
-        .indexOf(notifId);
-      userTo.notifications.splice(removeNotifIndex, 1);
-
       // remove like from post
       const removeIndex = post.likes
         .map(like => like.user.toString())
         .indexOf(req.user.id);
+
       post.likes.splice(removeIndex, 1);
+
+      // find and remove notification
+      const notification = await Notification.findOne({
+        user_from: req.user.id,
+        user_to: post.user,
+        item_id: req.params.id,
+        action: "like"
+      });
+
+      // if there is no notification that meet the requirements
+      if (!notification) {
+        return res.status(400).json({ msg: "Notification does not exist" });
+      }
+
+      // remove notification from user's notifications
+      const removeNotifIndex = userTo.notifications
+        .map(notif => notif.notification.toString())
+        .indexOf(notification._id);
+      userTo.notifications.splice(removeNotifIndex, 1);
+
+      notification.remove();
     } else {
       // create notification
       const messageString = userFrom.name + " liked your post";
@@ -167,11 +172,23 @@ router.put("/like/:id", auth, async (req, res) => {
         action: "like",
         message: messageString
       });
-      console.log(1);
       // add notification to user
-      userTo.notifications.unshift(newNotification);
+      userTo.notifications.unshift({
+        notification: newNotification,
+        user: {
+          userId: req.user.id,
+          avatar: userFrom.avatar,
+          name: userFrom.name,
+          username: userFrom.username,
+          email: userFrom.email
+        },
+        item_id: req.params.id,
+        action: "like",
+        message: messageString,
+        viewed: false,
+        opened: false
+      });
       await newNotification.save();
-      console.log(2);
       // unshift will add user to the front of the likes array of post
       post.likes.unshift({ user: req.user.id });
     }
@@ -192,6 +209,7 @@ router.put("/like/:id", auth, async (req, res) => {
 router.put("/unlike/:id", auth, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
+    const userTo = await User.findById(post.user);
 
     // Check if the post has already been liked
     // if length is 0, that means user has not liked the post, so they can't unlike the post
@@ -201,7 +219,6 @@ router.put("/unlike/:id", auth, async (req, res) => {
     ) {
       return res.status(400).json({ msg: "Post has not yet been liked" });
     }
-    post.isLiked = false;
     // Get remove index
     const removeIndex = post.likes
       .map(like => like.user.toString())
@@ -209,7 +226,29 @@ router.put("/unlike/:id", auth, async (req, res) => {
 
     post.likes.splice(removeIndex, 1);
 
+    // remove like notification for post
+    // find notification where userFrom is req.user.id and userTo is post.user and action is "like"
+    const notification = await Notification.findOne({
+      user_from: req.user.id,
+      user_to: post.user,
+      action: "like"
+    });
+
+    // if there is no notification that meet the requirements
+    if (!notification) {
+      return res.status(400).json({ msg: "Notification does not exist" });
+    }
+
+    //remove notification from user's notification list
+    const userToRemoveIndex = user_to.notifications
+      .map(notif => notif.notification.toString())
+      .indexOf(notification._id);
+    userTo.notifications.splice(userToRemoveIndex, 1);
+
+    notification.remove();
+
     await post.save();
+    await userTo.save();
 
     res.json(post.likes);
   } catch (err) {
@@ -241,29 +280,46 @@ router.post(
       const post = await Post.findById(req.params.id);
       const userFrom = await User.findById(req.user.id).select("-password");
       const userTo = await User.findById(post.user).select("-password");
-      const post_uuid = uuidv4();
+      const comment_uuid = uuidv4();
 
-      const messageString = userFrom.name + " commented on your post";
-      const newNotification = new Notification({
-        user_from: req.user.id,
-        user_to: post.user,
-        item_id: req.params.id,
-        uuid: post_uuid,
-        action: "comment",
-        message: messageString
-      });
+      if (post.user.toString() !== req.user.id) {
+        const messageString = userFrom.name + " commented on your post";
+        const newNotification = new Notification({
+          user_from: req.user.id,
+          user_to: post.user,
+          item_id: req.params.id,
+          uuid: comment_uuid,
+          action: "comment",
+          message: messageString
+        });
 
-      // add notification to user
-      userTo.notifications.unshift(newNotification);
-      await newNotification.save();
-      await userTo.save();
+        // add notification to user
+        userTo.notifications.unshift({
+          notification: newNotification,
+          user: {
+            userId: req.user.id,
+            avatar: userFrom.avatar,
+            name: userFrom.name,
+            username: userFrom.username,
+            email: userFrom.email
+          },
+          item_id: req.params.id,
+          uuid: comment_uuid,
+          action: "comment",
+          message: messageString,
+          viewed: false,
+          opened: false
+        });
+        await userTo.save();
+        await newNotification.save();
+      }
 
       const newComment = {
-        uuid: post_uuid,
+        user: req.user.id,
+        uuid: comment_uuid,
         text: req.body.commentText,
         name: userFrom.name,
-        avatar: userFrom.avatar,
-        user: req.user.id
+        avatar: userFrom.avatar
       };
 
       post.comments.unshift(newComment);
@@ -302,21 +358,34 @@ router.delete("/comment/:id/:comment_id", auth, async (req, res) => {
       return res.status(401).json({ msg: "User not authorized" });
     }
 
-    // find and remove notification
-    const notification = await Notification.findOne({
-      item_id: post._id,
-      uuid: comment.uuid,
+    // find and remove notification for:
+    //  - "x" commented on your post
+    const notificationComment = await Notification.findOneAndRemove({
+      item_id: req.params.id,
       action: "comment"
     });
 
-    const notifId = notification._id;
-    await notification.remove();
+    // - "x" liked your comment
+    const notificationLike = await Notification.deleteMany({
+      item_id: req.params.id,
+      uuid: comment.uuid,
+      action: "comment_like"
+    });
 
-    // remove notification from user's notifications
-    const removeNotifIndex = userTo.notifications
-      .map(notif => notif._id)
-      .indexOf(notifId);
-    userTo.notifications.splice(removeNotifIndex, 1);
+    // if (notificationComment) {
+    //   await notificationComment.remove();
+    // }
+
+    // if (notificationLike.length > 0) {
+    //   notificationLike.map(notif => {
+    //     // remove notification from user's notifications
+    //     const removeNotifIndex = userTo.notifications
+    //       .map(userNotif => userNotif._id)
+    //       .indexOf(notif._id);
+    //     userTo.notifications.splice(removeNotifIndex, 1);
+    //     await notif.remove();
+    //   });
+    // }
 
     // Get remove index
     const removeIndex = post.comments
@@ -346,31 +415,40 @@ router.put("/comment/like/:postId/:commentId", auth, async (req, res) => {
     const com = post.comments.filter(
       comment => comment._id.toString() === req.params.commentId
     )[0];
-
     const userFrom = await User.findById(req.user.id).select("-password");
     const userTo = await User.findById(com.user).select("-password");
-
     // Check if the comment has already been liked
-    // filter through the likes to see if current iteration of user is the one thats logged in
+    // filter through the likes to see if current iteration of user has liked the post already
     // this will only return something if theres a match, so if > 0 that means user has already liked the comment
     if (
       com.likes.filter(like => like.user.toString() === req.user.id).length > 0
     ) {
-      // find and remove notification
-      const notification = await Notification.findOne({
-        item_id: post._id,
-        uuid: com.uuid,
-        action: "like"
-      });
+      // if liked post already, find notification for like and remove it in notifications and user notifications array
 
-      const notifId = notification._id;
-      await notification.remove();
+      // only remove notification if comment owner is not the same as req.user.id
+      if (com.user.toString() !== req.user.id) {
+        // find and remove notification
+        const notification = await Notification.findOne({
+          user_from: req.user.id,
+          user_to: com.user,
+          item_id: post._id,
+          uuid: com.uuid,
+          action: "comment_like"
+        });
 
-      // remove notification from user's notifications
-      const removeNotifIndex = userTo.notifications
-        .map(notif => notif._id)
-        .indexOf(notifId);
-      userTo.notifications.splice(removeNotifIndex, 1);
+        // if there is no notification that meet the requirements
+        if (!notification) {
+          return res.status(400).json({ msg: "Notification does not exist" });
+        }
+
+        // remove notification from user's notifications
+        const removeNotifIndex = userTo.notifications
+          .map(notif => notif._id)
+          .indexOf(notification._id);
+        userTo.notifications.splice(removeNotifIndex, 1);
+
+        await notification.remove();
+      }
 
       // Get remove index
       const removeIndex = com.likes
@@ -379,26 +457,45 @@ router.put("/comment/like/:postId/:commentId", auth, async (req, res) => {
 
       com.likes.splice(removeIndex, 1);
     } else {
-      // create new notification
-      const messageString = userFrom.name + " liked your comment";
-      const newNotification = new Notification({
-        user_from: req.user.id,
-        user_to: com.user,
-        item_id: req.params.postId,
-        uuid: com.uuid,
-        action: "like",
-        message: messageString
-      });
+      // dont create notification for comment creator commenting on own comment
+      if (com.user.toString() !== req.user.id) {
+        // create new notification
+        const messageString = userFrom.name + " liked your comment";
+        const newNotification = new Notification({
+          user_from: req.user.id,
+          user_to: com.user,
+          item_id: req.params.postId,
+          uuid: com.uuid,
+          action: "comment_like",
+          message: messageString
+        });
 
-      // add notification to user
-      userTo.notifications.unshift(newNotification);
-      await newNotification.save();
-      await userTo.save();
+        // add notification to user
+        userTo.notifications.unshift({
+          notification: newNotification,
+          user: {
+            userId: req.user.id,
+            avatar: userFrom.avatar,
+            name: userFrom.name,
+            username: userFrom.username,
+            email: userFrom.email
+          },
+          item_id: req.params.comment_id,
+          uuid: com.uuid,
+          action: "comment_like",
+          message: messageString,
+          viewed: false,
+          opened: false
+        });
+        await newNotification.save();
+      }
+
       // unshift will add user to the front of the likes array of post
       com.likes.unshift({ user: req.user.id });
     }
 
     await post.save();
+    await userTo.save();
     res.json(com.likes);
   } catch (err) {
     console.error(err.message);
@@ -433,7 +530,7 @@ router.put("/comment/unlike/:postId/:commentId", auth, async (req, res) => {
     const notification = await Notification.findOne({
       item_id: post._id,
       uuid: com.uuid,
-      action: "like"
+      action: "comment_like"
     });
 
     const notifId = notification._id;

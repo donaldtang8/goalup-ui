@@ -750,10 +750,9 @@ a {
     font-weight: 600; }
   .user-nav__dropdown {
     position: absolute;
-    top: 6.5vh;
-    right: 0.5em;
     height: 10rem;
     width: 12.5rem;
+    top: 6.5vh;
     overflow: hidden;
     box-shadow: 0 1rem 2rem rgba(var(--color-dark), 0.15);
     border-radius: 0.5em;
@@ -762,6 +761,10 @@ a {
     display: block; }
     .user-nav__dropdown--hidden {
       display: none; }
+    .user-nav__dropdown--notifications {
+      right: 2rem; }
+    .user-nav__dropdown--user {
+      right: 0.5rem; }
     .user-nav__dropdown ul {
       display: flex;
       flex-direction: column;
@@ -803,6 +806,34 @@ a {
       .splash-nav .form__input::-webkit-input-placeholder {
         font-weight: 300;
         color: var(--color-grey-dark-2); }
+
+.notificationItem {
+  display: flex;
+  background-color: var(--color-grey-light-3);
+  border-radius: 1rem; }
+  .notificationItem:not(:last-child) {
+    margin-bottom: 2rem; }
+  .notificationItem__header {
+    flex: 30% 0 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem; }
+  .notificationItem__image img {
+    height: 7rem;
+    width: 7rem;
+    border-radius: 50%; }
+  .notificationItem__body {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    width: 100%; }
+    .notificationItem__body--main {
+      display: flex; }
+      .notificationItem__body--main-close {
+        margin-left: auto; }
+    .notificationItem__body--main i:hover {
+      cursor: pointer; }
 
 .postForm-container {
   width: 50%;
@@ -1382,6 +1413,15 @@ a {
 
 .groupsItems-container {
   width: 50%; }
+
+.notifications-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem auto; }
+
+.notificationsItems-container {
+  width: 30%; }
 
 .posts-container {
   display: flex;

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import { connect } from "react-redux";
 import { loadUser } from "../src/redux/actions/auth";
+import { getUserNotifications } from "../src/redux/actions/notifications";
 
 import setAuthToken from "../src/utils/setAuthToken";
 
@@ -29,11 +30,15 @@ const EditProfilePage = lazy(() => import("./pages/forms/editProfile"));
 const CreateGroupPage = lazy(() => import("./pages/forms/createGroup"));
 const EditGroupPage = lazy(() => import("./pages/forms/editGroup"));
 const FriendsPage = lazy(() => import("./pages/friends/friendsContainer"));
+const NotificationsPage = lazy(() =>
+  import("./pages/notifications/notificationsContainer")
+);
 
-const App = ({ loadUser, auth }) => {
+const App = ({ getUserNotifications, loadUser, auth }) => {
   useEffect(() => {
+    getUserNotifications();
     loadUser();
-  }, [loadUser]);
+  }, [getUserNotifications, loadUser]);
 
   return (
     <div className="App">
@@ -79,6 +84,11 @@ const App = ({ loadUser, auth }) => {
                     component={EditGroupPage}
                   />
                   <PrivateRoute exact path="/friends" component={FriendsPage} />
+                  <PrivateRoute
+                    exact
+                    path="/notifications"
+                    component={NotificationsPage}
+                  />
                 </main>
               </div>
             ) : (
@@ -103,4 +113,6 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(mapStateToProps, { loadUser })(App);
+export default connect(mapStateToProps, { getUserNotifications, loadUser })(
+  App
+);

@@ -6,12 +6,14 @@ const { check, validationResult } = require("express-validator");
 const User = require("../../models/User");
 const Notification = require("../../models/Notification");
 
-// @route   GET api/notification/
+// @route   GET api/notifications /
 // @desc    Get all notifications of user
 // @access  Private
 router.get("/", auth, async (req, res) => {
   try {
-    const allNotifications = await Notification.find().sort({ date: -1 });
+    const allNotifications = await Notification.find()
+      .sort({ date: -1 })
+      .populate("user_from", ["name", "avatar", "username", "email"]);
     const notifications = allNotifications.filter(
       notif => notif.user_to.toString() === req.user.id
     );
@@ -97,7 +99,7 @@ router.delete("/:id", auth, async (req, res) => {
   try {
     let notification = await Notification.findById(req.params.id);
     // if notification is not owned by req.user.id, user is not authorized
-    if (notification.user_from !== req.user.id) {
+    if (notification.user_to.toString() !== req.user.id) {
       return res.status(401).json({ msg: "User not authorized" });
     }
     const userFrom = await User.findById(req.user.id);
@@ -106,6 +108,9 @@ router.delete("/:id", auth, async (req, res) => {
       .map(notif => notif._id)
       .indexOf(req.params.id);
     userFrom.notifications.splice(notifRemoveIndex, 1);
+    await notification.remove();
+    await userFrom.save();
+    res.json(userFrom.notifications);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");

@@ -21,7 +21,9 @@ const EditGroup = ({
     getGroupById(match.params.id);
   }, [getGroupById, match.params.id]);
 
-
+  useEffect(() => {
+    fillInputs();
+  }, [group]);
 
   const [formData, setFormData] = useState({
     field: "",
@@ -53,10 +55,6 @@ const EditGroup = ({
       });
     }
   };
-
-  useEffect(() => {
-    fillInputs();
-  }, [group, fillInputs]);
 
   const { field, name, description, hobbies, interests } = formData;
 

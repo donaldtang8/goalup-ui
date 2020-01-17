@@ -13,6 +13,8 @@ import {
 } from "./types";
 import setAuthToken from "../../utils/setAuthToken";
 
+import { getUserNotifications } from "../actions/notifications";
+
 // Login user
 export const login = (email, password, history) => async dispatch => {
   const config = {
@@ -28,6 +30,7 @@ export const login = (email, password, history) => async dispatch => {
       payload: res.data
     });
     await dispatch(loadUser());
+    await dispatch(getUserNotifications());
     history.push("/");
   } catch (err) {
     if (err.response) {

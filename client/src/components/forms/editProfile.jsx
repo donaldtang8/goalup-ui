@@ -9,6 +9,7 @@ const EditProfile = ({
   profile: { profile },
   createProfile,
   getCurrentProfile,
+  match,
   history
 }) => {
   useEffect(() => {
@@ -93,7 +94,7 @@ const EditProfile = ({
   }, [formData]);
 
   const onChange = e =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, field: e.target.name, [e.target.name]: e.target.value });
 
   const onSubmit = e => {
     e.preventDefault();
