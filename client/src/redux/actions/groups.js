@@ -322,11 +322,13 @@ export const deleteGroup = (groupId, history) => async dispatch => {
     try {
       await axios.delete(`/api/groups/${groupId}`);
       dispatch({
-        type: CLEAR_GROUP
+        type: CLEAR_GROUP,
+        payload: groupId
       });
       dispatch(setAlert("Your group has been permanently deleted"));
       history.push("/groups");
     } catch (err) {
+      console.log(err);
       dispatch({
         type: GROUP_ERROR,
         payload: { msg: err.response.statusText, status: err.response.status }

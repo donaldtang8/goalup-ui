@@ -95,7 +95,7 @@ router.post(
         admins: [{ user: req.user.id }],
         members: [{ user: req.user.id }]
       });
-      user.groups.unshift(newGroup);
+      user.groups.unshift({ group: newGroup });
       const group = await newGroup.save();
       await user.save();
       res.json(group);
@@ -163,9 +163,7 @@ router.put(
 // @access   Public
 router.get("/:groupId", async (req, res) => {
   try {
-    const group = await Group.findOne({
-      _id: req.params.groupId
-    })
+    const group = await Group.findById(req.params.groupId)
       .populate("admins.user")
       .populate("members.user")
       .populate("posts.post");
@@ -188,8 +186,10 @@ router.put("/join/:id", auth, async (req, res) => {
   try {
     const group = await Group.findById(req.params.id);
     const self = await User.findOne({ _id: req.user.id });
+
     //  if user is already joined, then remove them
     if (!group) return res.status(400).json({ msg: "Group not found" });
+    if (!self) return res.status(400).json({ msg: "User not found" });
     if (
       group.members.filter(member => member.user.toString() === req.user.id)
         .length > 0
@@ -199,7 +199,7 @@ router.put("/join/:id", auth, async (req, res) => {
         .indexOf(req.user.id);
       group.members.splice(removeIndex, 1);
     } else {
-      // unshift will add user to the front of the likes array of post
+      // unshift will add user to the front of the members array of group
       group.members.unshift({ user: req.user.id });
     }
     // add/remove group from user
@@ -382,12 +382,12 @@ router.delete("/:groupId/:postId", auth, async (req, res) => {
 });
 
 // @route    DELETE api/groups/:groupId
-// @desc     Delete profile, user & posts
+// @desc     Delete group and all of its posts
 // @access   Private
 router.delete("/:groupId", auth, async (req, res) => {
   try {
-    let group = await Group.findOne({ _id: req.params.groupId });
-    if (!group) res.status(400).json({ msg: "No group found" });
+    let group = await Group.findById(req.params.groupId);
+    if (!group) return res.status(400).json({ msg: "No group found" });
     if (group.creator.toString() !== req.user.id)
       return res.status(401).json({ msg: "User not authorized" });
 

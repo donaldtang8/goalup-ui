@@ -237,6 +237,12 @@ const EditGroup = ({
         >
           Edit Group
         </button>
+        <button
+          className="btn btn--primary"
+          onClick={() => deleteGroup(group._id, history)}
+        >
+          Delete Group
+        </button>
       </div>
     </form>
   );

@@ -318,6 +318,7 @@ a {
   display: inline-block;
   border-radius: 10rem;
   font-size: 1.5rem;
+  display: block;
   border: none;
   cursor: pointer;
   /* All properties enabled to be animated */
@@ -343,7 +344,8 @@ a {
 
 .btn--primary {
   background-color: var(--color-primary);
-  color: var(--color-light); }
+  color: var(--color-light);
+  margin: 2rem 0; }
   .btn--primary::after {
     background-color: var(--color-primary); }
 

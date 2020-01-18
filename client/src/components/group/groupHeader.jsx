@@ -26,7 +26,7 @@ const GroupHeader = ({
 }) => {
   return (
     <div className="group-container__header">
-      <div className="group-container__header--banner">Banner here</div>
+      <div className="group-container__header--banner"></div>
       <div className="group-container__header--picture">
         {auth && auth.user && (
           <img

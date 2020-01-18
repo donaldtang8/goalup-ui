@@ -127,6 +127,13 @@ export default function(state = initialState, action) {
         },
         loading: false
       };
+    case CLEAR_GROUP:
+      return {
+        ...state,
+        group: null,
+        groups: state.groups.filter(group => group._id !== payload),
+        loading: false
+      }
     case GROUP_ERROR:
       return { ...state, group: null, error: payload, loading: false };
     default:

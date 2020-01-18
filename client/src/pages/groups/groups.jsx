@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
 import { getGroups, getJoinedGroups } from "../../redux/actions/groups";
 import PropTypes from "prop-types";
@@ -14,6 +15,9 @@ const Groups = ({ getGroups, getJoinedGroups, groups: { groups } }) => {
 
   return (
     <div className="groups-container">
+      <Link to="/group/create-group" className="btn-small btn--primary">
+        Create Group
+      </Link>
       <div className="groupsItems-container">
         {groups.map(group => (
           <GroupItem key={group._id} group={group} />

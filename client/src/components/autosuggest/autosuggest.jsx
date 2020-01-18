@@ -103,7 +103,7 @@ const AutosuggestSearch = ({ getProfiles, getGroups, profiles, groups }) => {
         to={
           suggestion.type === "profile"
             ? `/profiles/${suggestion.id}`
-            : `/group/${suggestion.id}`
+            : `/groups/${suggestion.id}`
         }
       >
         <div className="suggestion-content">
